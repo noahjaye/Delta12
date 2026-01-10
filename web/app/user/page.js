@@ -1,74 +1,30 @@
 'use client';
+import User from "./user"
 import React, { useEffect, useState } from 'react';
 
-export default function Home() {
-  async function ping(url, data) {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/${url}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      }
-    );
-    console.log(await res.json());
+export default function Page() {
+
+    
+  const lebron = {
+    username: "LeBron",
+    drugs: [
+      ["Tylenol", 0, 1, "pills"],
+      ["Vivace", 0, 3, "grams"]
+    ]
   }
-  // Drug name, taken today, daily dose, dose unit
-  let user = [["Tylenol", 0, 1, 'pills'], ["Vivace", 0, 3, 'grams']]
-  const [drugs, setDrugs] = useState(user);
 
-
-  function handleTrack(i) {
-  setDrugs(prev => {
-    const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
-    // const updated = [...prev];
-    updated[i][1] = updated[i][1] + 1; // increment takenToday
-    return updated;
-  });
-}
+  const drake = {
+    username: "Drake",
+    drugs: [
+      ["Advil", 0, 2, "pills"],
+      ["Omega 3", 0, 1, "capsules"]
+    ]
+  }
 
   return (
-    <div className="flex flex-col align-middle">
-      <h1 className="flex justify-center text-5xl p-8"> 
-        {username}
-      </h1>
-
-    <table className="w-9/12 border border-gray-300 mx-auto">
-      <thead>
-        <tr>
-          <th className="px-4 py-2 border">Medication</th>
-          <th className="px-4 py-2 border">Dosage</th>
-          <th className="px-4 py-2 border">Taken Today</th>
-          <th className="px-4 py-2 border">Count</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {drugs.map((drug, index) => (
-          <tr key={index}>
-            <td className="px-4 py-2 border">{drug[0]}</td>
-            <td className="px-4 py-2 border">{drug[2]}</td>
-            <td className="px-4 py-2 border">{`${drug[1]} / ${drug[2]} ${drug[3]}`}</td>
-
-            <td className="px-4 py-2 border">
-              <button
-                className="px-3 py-1 bg-blue-500 text-white rounded"
-                onClick={() => handleTrack(index)}
-              >
-                Track
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-
-      <div>
-        <button onClick={() => ping("invite")}>Invite</button>
-        <button onClick={() => ping("newuser")}>New user</button>
-        <button onClick={() => ping("login")}>Login</button>
-      </div>
+    <div>
+      <User userNameExternal={lebron.username} drugsExternal={lebron.drugs} />
+      <User userNameExternal={drake.username} drugsExternal={drake.drugs} />
     </div>
   )
 }
-
