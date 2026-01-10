@@ -38,16 +38,7 @@ async function run() {
    * insert them all in one call with collection.insertMany().
    */
   
-  const recipes = [
-    {
-      "username": "",
-      "drugs": {
-          "name": "",
-          "dosage": 0,
-          "units": ""
-      }
-    }
-  ];
+  
 
   try {
     const insertManyResult = await collection.insertMany(recipes);
