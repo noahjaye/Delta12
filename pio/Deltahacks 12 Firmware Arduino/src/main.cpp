@@ -6,7 +6,11 @@
 #define REFRESH_RATE 60 // in Hz
 
 rgb_lcd lcd;
+
 BLEPeripheral pillBottle;
+BLEService counterService("12345678-1280-1280-1280-67676deltah0");
+BLEUnsignedIntCharacteristic counterCharacteristic("87654321-1280-1280-1280-deltah676767", BLERead | BLENotify);
+unsigned int counterValue = 0;
 
 bool touchState = LOW;
 bool lastTouchState = LOW;
@@ -18,10 +22,20 @@ void setup() {
     lcd.setRGB(255, 255, 255);
     lcd.print("Hello, World!");
     
-    Serial.begin(9600);
-    Serial.println("LCD Initialized");
+    // Initialize BLE
+    pillBottle.setLocalName("LeBron's Secret Stash");
+    pillBottle.setAdvertisedServiceUuid(counterService.uuid());
+    pillBottle.addAttribute(counterService);
+    pillBottle.addAttribute(counterCharacteristic);
+    counterCharacteristic.setValue(counterValue);
+    pillBottle.begin();
     
+    // Initialize touch sensor pin
     pinMode(TOUCH_PIN, INPUT);
+
+    // Initialize Serial for debugging
+    Serial.begin(9600);
+    Serial.println("Setup complete.");
     
     delay(1000);
     lcd.clear();
@@ -49,15 +63,14 @@ void loop() {
         // Touched
         if (touchState == HIGH) {
             lcd.print("Touched!        ");
-
-
+            counterValue++;
+            counterCharacteristic.setValue(counterValue);
+            Serial.println("Counter updated: " + String(counterValue));
         } 
         
         // Released
         else {
             lcd.print("                ");
-
-
         }
 
         lastTouchState = touchState;
