@@ -5,7 +5,6 @@ import dbclient from '../lib/db.js'
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-    console.log("POOP", req.body)
     
     const username = req.body.username
     console.log("RECEIVEDUSERNAME", username)
