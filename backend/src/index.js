@@ -2,9 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 //routes
-import inviteRouter from './routes/invite.js'
-import login from './routes/login.js'
-
+import newuser from './routes/newuser.js'
 dotenv.config({path: './secrets/backend.env'});
 
 const app = express();
@@ -17,9 +15,8 @@ app.use(cors({
 app.use(express.json());
 
 //use routers here
-app.use('/invite', inviteRouter)
-app.use('/signup', login)
-
+app.use('/newuser', newuser)
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (req, res) => {
   res.json({ ok: true });
