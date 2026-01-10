@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import inviteRouter from './routes/invite.js'
 import login from './routes/login.js'
 
-dotenv.config();
+dotenv.config({path: './secrets/backend.env'});
 
 const app = express();
 
