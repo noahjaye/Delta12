@@ -8,7 +8,7 @@
 rgb_lcd lcd;
 
 BLEPeripheral pillBottle;
-BLEService counterService("12345678-1280-1280-1280-67676deltah0");
+BLEService counterService("12345678-1280-1280-1280-676767deltah");
 BLEUnsignedIntCharacteristic counterCharacteristic("87654321-1280-1280-1280-deltah676767", BLERead | BLENotify);
 unsigned int counterValue = 0;
 

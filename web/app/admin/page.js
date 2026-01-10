@@ -1,6 +1,10 @@
 "use client";
 import { useState } from "react";
 
+// BLE service UUIDs
+const SERVICE = "12345678-1280-1280-1280-676767deltah";
+const CHARACTERISTIC = "87654321-1280-1280-1280-deltah676767";
+
 export default function Admin() {
     const [db, setDb] = useState([
     { LeBron: [{ Tylenol: 1 }, { Vivace: 3 }] },
