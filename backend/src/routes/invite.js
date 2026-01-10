@@ -1,5 +1,5 @@
 import express from 'express'
-import db from '../lib/db.js'
+import db from '../lib/db.cjs'
 //import passcheck from '../lib/passcheck.js';
 
 const router = express.Router();
