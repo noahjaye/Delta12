@@ -1,4 +1,5 @@
 'use client';
+import React, { useEffect, useState } from 'react';
 
 export default function Home() {
   async function ping(url, data) {
@@ -12,58 +13,80 @@ export default function Home() {
     );
     console.log(await res.json());
   }
+  // Drug name, taken today, daily dose, dose unit
+  let user = [["Tylenol", 0, 1, 'pills'], ["Vivace", 0, 3, 'grams']]
+  const [username, setUsername] = useState("LeBron");
+  const [drugs, setDrugs] = useState(user);
 
-  let db = [
-    {"LeBron" : [["Tylenol", 1], ["Vivace", 3]]},
-    {"LeTwo" : [["Tylenol", 4], ["Vivace", 2]]},
-  ]
+
+  function handleTrack(i) {
+  setDrugs(prev => {
+    const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
+    // const updated = [...prev];
+    updated[i][1] = updated[i][1] + 1; // increment takenToday
+    return updated;
+  });
+
+
+}
+
+
+
 
   return (
     <div className="flex flex-col align-middle">
-
       <h1 className="flex justify-center text-5xl p-8"> 
-        Lorem Ipsum 
+        {username}
       </h1>
 
-      <table className="w-9/12 border border-gray-300 mx-auto">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 border">Medication</th>
-            <th className="px-4 py-2 border">Dosage</th>
-            <th className="px-4 py-2 border">Edit</th>
-          </tr>
-        </thead>
+    <table className="w-9/12 border border-gray-300 mx-auto">
+      <thead>
+        <tr>
+          <th className="px-4 py-2 border">Medication</th>
+          <th className="px-4 py-2 border">Dosage</th>
+          <th className="px-4 py-2 border">Taken Today</th>
+          <th className="px-4 py-2 border">Count</th>
+        </tr>
+      </thead>
 
-        <tbody>
-          <tr>
-            <td className="px-4 py-2 border">{db[0]["LeBron"][0][0]}</td>
-            <td className="px-4 py-2 border">{db[0]["LeBron"][0][1]}</td>
+      <tbody>
+        {drugs.map((drug, index) => (
+          <tr key={index}>
+            <td className="px-4 py-2 border">{drug[0]}</td>
+            <td className="px-4 py-2 border">{drug[2]}</td>
+            <td className="px-4 py-2 border">{`${drug[1]} / ${drug[2]} ${drug[3]}`}</td>
+
             <td className="px-4 py-2 border">
-              <button className="px-3 py-1 bg-blue-500 text-white rounded">
-                Edit
+              <button
+                className="px-3 py-1 bg-blue-500 text-white rounded"
+                onClick={() => handleTrack(index)}
+              >
+                Track
               </button>
             </td>
           </tr>
-        </tbody>
-      </table>
+        ))}
+      </tbody>
+    </table>
+
 
 
       {/* <div className="flex justify-center ">
-          {/* {db.map((user) => ( */}
-            {/* <div className="flex pl-10 pr-10 gap-5">
+          {db.map((user) => ( 
+            <div className="flex pl-10 pr-10 gap-5">
                 <p>Text</p>
                 <p>Dosage</p>
                 <button>Button</button>
-            </div> */} 
-            {/* <li key={fruit}>{fruit}</li> */}
-          {/* ))} */}
+            </div> 
+            <li key={fruit}>{fruit}</li> 
+          ))}
 
-      {/* </div> */}
+      </div>  */}
 
 
       <div>
         <button onClick={() => ping("invite")}>Invite</button>
-        <button onClick={() => ping("signup")}>New user</button>
+        <button onClick={() => ping("newuser")}>New user</button>
         <button onClick={() => ping("login")}>Login</button>
       </div>
     </div>
