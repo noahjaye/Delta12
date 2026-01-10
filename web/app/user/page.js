@@ -16,8 +16,6 @@ export default function Home() {
   // Drug name, taken today, daily dose, dose unit
   let user = [["Tylenol", 0, 1, 'pills'], ["Vivace", 0, 3, 'grams']]
   const [drugs, setDrugs] = useState(user);
-  const [username, setUsername] = useState("LeBron")
-  
 
 
   function handleTrack(i) {
