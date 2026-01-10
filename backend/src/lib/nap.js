@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb"
 import dotenv from "dotenv"
+import dbclient from "./db.js"
 
 async function run() {
   // TODO:
@@ -7,19 +8,16 @@ async function run() {
   // Altas cluster specifics. Be sure it includes
   // a valid username and password! Note that in a production environment,
   // you do not want to store your password in plain-text here.
-  dotenv.config({path: './secrets/backend.env'})
-  const uri = process.env.MONGO_URI
-  console.log("URI", uri)
-  console.log("PORT", process.env.PORT)
 
   // The MongoClient is the object that references the connection to our
   // datastore (Atlas, for example)
-  const client = new MongoClient(uri);
+  const client = dbclient
 
   // The connect() method does not attempt a connection; instead it instructs
   // the driver to connect using the settings provided when a connection
   // is required.
   await client.connect();
+  
 
   // Provide the name of the database and collection you want to use.
   // If the database and/or collection do not exist, the driver and Atlas
@@ -39,64 +37,15 @@ async function run() {
    * In this example, we're going to create four documents and then
    * insert them all in one call with collection.insertMany().
    */
-
+  
   const recipes = [
     {
-      name: "elotes",
-      ingredients: [
-        "corn",
-        "mayonnaise",
-        "cotija cheese",
-        "sour cream",
-        "lime",
-      ],
-      prepTimeInMinutes: 35,
-    },
-    {
-      name: "loco moco",
-      ingredients: [
-        "ground beef",
-        "butter",
-        "onion",
-        "egg",
-        "bread bun",
-        "mushrooms",
-      ],
-      prepTimeInMinutes: 54,
-    },
-    {
-      name: "patatas bravas",
-      ingredients: [
-        "potato",
-        "tomato",
-        "olive oil",
-        "onion",
-        "garlic",
-        "paprika",
-      ],
-      prepTimeInMinutes: 80,
-    },
-    {
-      name: "fried rice",
-      ingredients: [
-        "rice",
-        "soy sauce",
-        "egg",
-        "onion",
-        "pea",
-        "carrot",
-        "sesame oil",
-      ],
-      prepTimeInMinutes: 40,
-    },
-    {
-      name: "veg pasta",
-      ingredients: [
-        "linguini",
-        "tomato sauce"
-      ],
-      prepTimeInMinutes: 15,
-      colorOfTheSky: "Blue"
+      "username": "",
+      "drugs": {
+          "name": "",
+          "dosage": 0,
+          "units": ""
+      }
     }
   ];
 
