@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 //routes
 import newuser from './routes/newuser.js'
+import updatedrugs from './routes/updatedrugs.js'
+import getuser from './routes/getuser.js'
+
 dotenv.config({path: './secrets/backend.env'});
 
 const app = express();
@@ -19,6 +22,10 @@ let counterValue = 0;
 
 //use routers here
 app.use('/newuser', newuser)
+app.use('/updatedrugs', updatedrugs)
+app.use('/getuser', getuser) 
+
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (req, res) => {
