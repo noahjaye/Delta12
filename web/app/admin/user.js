@@ -116,11 +116,11 @@ export default function User(props) {
             <td className="px-4 py-2 border">{drug[2]}</td>
             <td className="px-4 py-2 border">{`${drug[1]} / ${drug[2]} ${drug[3]}`}</td>
 
-            <td className="px-4 py-2 border">
-              <button onClick={() => incrementHandleTrack(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110">
+            <td className="px-4 py-2 border flex justify-center">
+              <button onClick={() => incrementHandleTrack(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110 size-10">
                 +
               </button>
-              <button onClick={() => decrementHandleTrack(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110">
+              <button onClick={() => decrementHandleTrack(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110 size-10">
                 -
               </button>
               <button className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110">
