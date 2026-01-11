@@ -120,34 +120,6 @@ export default function Admin() {
                     Connect to Prescription
                 </button>
             </div>
-            {/* <table className="w-9/12 border border-gray-300 m-10 mx-auto">
-                <thead>
-                    <tr>
-                        <th className="px-4 py-2 border">User</th>
-                        <th className="px-4 py-2 border">Medication</th>
-                        <th className="px-4 py-2 border">Dosage</th>
-                        <th className="px-4 py-2 border">Edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td className="px-4 py-2 border text-center">{Object.keys(db[0])[0]}</td>
-                        <td className="px-4 py-2 border text-center">{Object.keys(db[0]["LeBron"][0])[0]}</td>
-                        <td className="px-4 py-2 border text-center">{db[0]["LeBron"][0]["Tylenol"]}</td>
-                        <td className="px-4 py-2 border text-center">
-                            <button onClick={incrementDosage} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110">
-                                +
-                            </button>
-                            <button onClick={decrementDosage} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110">
-                                -
-                            </button>
-                            <button className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110">
-                                Edit
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table> */}
              <div>
                    <User userNameExternal={lebron.username} drugsExternal={lebron.drugs} />
                    <User userNameExternal={drake.username} drugsExternal={drake.drugs} />
