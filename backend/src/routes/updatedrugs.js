@@ -1,5 +1,6 @@
 import express from 'express'
-import dbclient from '../lib/db.js'
+import {dbclient, getDb} from '../lib/db.js'
+
 //import passcheck from '../lib/passcheck.js';
 
 const router = express.Router();
@@ -7,12 +8,10 @@ const router = express.Router();
 router.post('/', async (req, res) => {
     const username = req.body.username
     const drugs = req.body.drugs
-    console.log("RECEIVEDDRUG", drug)
-    const dbName = "myDatabase"
-    const collectionName = "users"
+    console.log("RECEIVEDDRUG", drugs)
 
-    const database = dbclient.db(dbName)
-    const collection = database.collection(collectionName)
+    const database = await getDb()
+    const collection = database.collection("users")
 
     await dbclient.connect()
 
@@ -23,7 +22,6 @@ router.post('/', async (req, res) => {
     );
     console.log("RES", result)
     res.json({ drugs: true });
-    await dbclient.close()
 
 });
 
