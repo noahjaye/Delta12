@@ -47,7 +47,7 @@ export default function Admin() {
 
                 setDb((prev) => {
                     const copy = structuredClone(prev);
-                    copy[0].LeBron[0].Tylenol++;
+                    copy[0].LeBron[0].Tylenol = counter;
                     return copy;
                 });
             });
@@ -56,13 +56,22 @@ export default function Admin() {
         }
     }
 
-    const incrementDosage = () => {
+    const incrementDosage = async () => {
         setDb(prev => {
             const copy = structuredClone(prev)
             copy[0].LeBron[0].Tylenol += 1
             return copy
         } 
         );
+
+        if (cmdCharacteristicRef.current) {
+            try {
+                await cmdCharacteristicRef.current.writeValue(new Uint8Array([2]));
+                console.log("Sent increment command to device");
+            } catch (error) {
+                console.error("Error sending command to device: ", error);
+            }
+        }
     }
     const decrementDosage = async () => {
         setDb(prev => {
@@ -146,4 +155,3 @@ export default function Admin() {
         </div>
     )
 }
-
