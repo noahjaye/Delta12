@@ -159,9 +159,9 @@ export default function User(props) {
         <tbody>
           {drugs.map((drug, index) => (
             <tr key={index}>
-              <td className="px-4 py-2 border">{drug[0]}</td>
-              <td className="px-4 py-2 border">{drug[2]}</td>
-              <td className="px-4 py-2 border">{`${drug[1]} / ${drug[2]} ${drug[3]}`}</td>
+              <td className="px-4 py-2 border">{drug.drug}</td>
+              <td className="px-4 py-2 border">{drug.dosage}</td>
+              <td className="px-4 py-2 border">{`${drug.taken} / ${drug.dosage} ${drug.unit}`}</td>
             </tr>
           ))}
         </tbody>

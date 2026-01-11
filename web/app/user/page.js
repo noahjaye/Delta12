@@ -28,6 +28,7 @@ export default function Page() {
       .finally(() => setLoading(false));
   }, [username]);
 
+  console.log("USD", userData)
   return (
     <div>
       <Form
