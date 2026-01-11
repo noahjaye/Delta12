@@ -30,7 +30,7 @@ export default function Page() {
 
   console.log("USD", userData)
   return (
-    <div>
+    <div className="min-h-screen bg-slate-50 p-8 font-sans text-slate-900">
       <Form
         name="Patient name"
         handleSub={setUsername}
@@ -38,7 +38,7 @@ export default function Page() {
         Form
       </Form>
 
-      {loading && <p>Loading user data...</p>}
+      {loading && <p className="text-sm text-slate-600">Loading user data...</p>}
 
       {userData && (
         <User
@@ -48,7 +48,7 @@ export default function Page() {
       )}
 
       {!loading && username && !userData && (
-        <p>User not found.</p>
+        <p className="text-sm text-rose-600">User not found.</p>
       )}
     </div>
   );
