@@ -64,28 +64,35 @@ export default function User(props) {
 
       // Handle initial value
       const initialValue = await counterChar.readValue();
-      const counterValue = initialValue.getUint32(0, true);
-      console.log("Initial counter value:", counterValue);
+      const tylenolValue = initialValue.getUint32(0, true);
+      const vivaceValue = initialValue.getUint32(4, true);
+      console.log("Initial values - Tylenol:", tylenolValue, "Vivace:", vivaceValue);
+      
       setDrugs((prev) => {
-          const updated = prev.map((drug, index) => 
-            index === 0 ? [drug[0], counterValue, drug[2], drug[3]] : drug
-          );
-          return updated;
+        const updated = prev.map((drug, index) => {
+          if (index === 0) return [drug[0], tylenolValue, drug[2], drug[3]];
+          if (index === 1) return [drug[0], vivaceValue, drug[2], drug[3]];
+          return drug;
         });
+        return updated;
+      });
 
       // Setup notifications for counter characteristic updates
       await counterChar.startNotifications();
       
       notificationHandlerRef.current = (event) => {
         const dataView = event.target.value;
-        const newCounterValue = dataView.getUint32(0, true);
-        console.log("Counter updated to:", newCounterValue);
+        const tylenolValue = dataView.getUint32(0, true);
+        const vivaceValue = dataView.getUint32(4, true);
+        console.log("Updated values - Tylenol:", tylenolValue, "Vivace:", vivaceValue);
 
-        // Update the first drug's takenToday value with the counter value
+        // Update both drugs with their respective counter values
         setDrugs((prev) => {
-          const updated = prev.map((drug, index) => 
-            index === 0 ? [drug[0], newCounterValue, drug[2], drug[3]] : drug
-          );
+          const updated = prev.map((drug, index) => {
+            if (index === 0) return [drug[0], tylenolValue, drug[2], drug[3]];
+            if (index === 1) return [drug[0], vivaceValue, drug[2], drug[3]];
+            return drug;
+          });
           return updated;
         });
       };
@@ -110,18 +117,6 @@ export default function User(props) {
       setIsConnected(false);
       setConnectionStatus("Disconnected");
     }
-  }
-
-  async function handleTrack(i) {
-    setDrugs((prev) => {
-      const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
-      // const updated = [...prev];
-      updated[i][1] = updated[i][1] + 1; // increment takenToday
-      console.log("USERNAME", username)
-      console.log("DRUGS", drugs)
-      return updated;
-    });
-    console.log("Updated", drugs)
   }
 
   return (
@@ -153,9 +148,8 @@ export default function User(props) {
         <thead>
           <tr>
             <th className="px-4 py-2 border">Medication</th>
-            <th className="px-4 py-2 border">Dosage</th>
+            <th className="px-4 py-2 border">Daily Dose</th>
             <th className="px-4 py-2 border">Taken Today</th>
-            <th className="px-4 py-2 border">Count</th>
           </tr>
         </thead>
 
@@ -165,15 +159,6 @@ export default function User(props) {
               <td className="px-4 py-2 border">{drug[0]}</td>
               <td className="px-4 py-2 border">{drug[2]}</td>
               <td className="px-4 py-2 border">{`${drug[1]} / ${drug[2]} ${drug[3]}`}</td>
-
-              <td className="px-4 py-2 border">
-                <button
-                  className="px-3 py-1 bg-blue-500 text-white rounded"
-                  onClick={() => handleTrack(index)}
-                >
-                  Track
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>
