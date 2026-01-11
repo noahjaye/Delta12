@@ -15,6 +15,7 @@ export default function User(props) {
   const [drug, setDrug] = useState()
   const [dosage, setDosage] = useState()
   const [unit, setUnit] = useState()
+  console.log("Userdrugs", drugs)
   function makeChangeHandler(setter) {
     return function(e) {
       const { name, value } = e.target;
@@ -57,7 +58,9 @@ export default function User(props) {
       </thead>
     
     <tbody>
-      {drugs.map((drug, index) => (
+      {
+      
+      drugs?.map((drug, index) => (
         <tr key={index}>
         <td className="px-4 py-2 border">{drug[0]}</td>
         <td className="px-4 py-2 border">{drug[2]}</td>

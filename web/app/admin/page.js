@@ -26,9 +26,13 @@ export default function Admin() {
             }).then((thing2) => {
                 let parse = JSON.parse(thing2)
                 docs = parse
-                const promises = docs.map((username) => ping("getuser", { username }));
+                console.log("PARSE", parse)
+                const promises = docs.map((name) => {
+                    console.log(name)
+                    return ping("getuser", { username: {name: name}})
+                });
                 Promise.all(promises).then((results) => {
-
+                    console.log("ALLPINGED", results)
                     setDb(results);
                 });
                 
@@ -73,11 +77,6 @@ export default function Admin() {
             // Initial read
             const initial = await characteristic.readValue();
             const initialCounter = initial.getUint32(0, true);
-            setDb((prev) => {
-                const copy = structuredClone(prev);
-                copy[0].LeBron[0].Tylenol = initialCounter;
-                return copy;
-            });
 
             console.log(`Initial Dosage: ${initialCounter}`);
 
@@ -87,31 +86,10 @@ export default function Admin() {
                 const counter = event.target.value.getUint32(0, true);
                 console.log(`Dosage Updated: ${counter}`);
 
-                setDb((prev) => {
-                    const copy = structuredClone(prev);
-                    copy[0].LeBron[0].Tylenol = counter;
-                    return copy;
-                });
             });
         } catch (error) {
             console.log("Oops... " + error);
         }
-    }
-
-      const lebron = {
-    username: "LeBron",
-    drugs: [
-      ["Tylenol", 0, 1, "pills"],
-      ["Vivace", 0, 3, "grams"]
-    ]
-  }
-
-  const drake = {
-    username: "Drake",
-    drugs: [
-      ["Advil", 0, 2, "pills"],
-      ["Omega 3", 0, 1, "capsules"]
-    ]
     }
 
     return (
@@ -132,21 +110,22 @@ export default function Admin() {
                     {console.log("DRN", doctorName)}
                     <Form name={"Doctor name"} handleSub={changeDoc}>Form</Form>
                     <p>PATIENTS ...-- THIS LINE NEEDS CSS </p>
+                     <Form name={"Patient name"} handleSub={((io) => ping('newuser', {username: io, doctor: doctorName}))}>Form</Form>
                     {db.map( (item, index) => {
                         console.log("DBITEM", item)
-                        const parsed = JSON.parse(item.user)
-                        console.log("PA", parsed)
-                        const username = parsed.username;
-                        const drugsArray = /*item[username] | */[{ Tylenol: 49 }, { Vivace: 3 }]; // array of { drug: qty }
-                        console.log("USERNAMEEXT", username)
+                        const json = JSON.parse(item.user)
+                        console.log("JSONPARSE", json)
+                        const username = json.username;
+                        const drugsArray = json?.drugs; // array of { drug: qty }
+                        console.log("USERNAMEEXT", username, drugsArray)
                         return (
                             <div key={`${username}-${index}`}>
-                            <User userNameExternal={doctorName.name} drugsExternal={drugsArray}></User>
+                            <User userNameExternal={username} drugsExternal={drugsArray}></User>
                             </div>
                         );
                     })}
 
-                    <Form name={"Patient name"} handleSub={((io) => ping('newuser', {username: io, doctor: doctorName}))}>Form</Form>
+                   
              </div>
         </div>
     )
