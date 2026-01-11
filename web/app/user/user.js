@@ -4,7 +4,6 @@ process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
 
 const PRESCRIPTION_SERVICE_UUID = "12345678-1280-1280-1280-676767abcdef";
 const COUNTER_CHARACTERISTIC_UUID = "87654321-1280-1280-1280-abcdef676767";
-const COMMAND_CHARACTERISTIC_UUID = "12345678-1280-1280-1280-abcdefabcdef";
 
 export default function User(props) {
   const [username, setUsername] = useState(props.userNameExternal)
@@ -67,6 +66,12 @@ export default function User(props) {
       const initialValue = await counterChar.readValue();
       const counterValue = initialValue.getUint32(0, true);
       console.log("Initial counter value:", counterValue);
+      setDrugs((prev) => {
+          const updated = prev.map((drug, index) => 
+            index === 0 ? [drug[0], counterValue, drug[2], drug[3]] : drug
+          );
+          return updated;
+        });
 
       // Setup notifications for counter characteristic updates
       await counterChar.startNotifications();
