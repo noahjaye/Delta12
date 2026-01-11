@@ -139,45 +139,43 @@ function updrug(index, delta, uname) {
   }
 
   return (
-    <div className="flex flex-col mb-10">
-      <h1 className="flex justify-center text-5xl p-8"> 
-        {username}
-      </h1>
+    <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+      <h1 className="text-4xl font-semibold text-slate-800 p-6">{username}</h1>
 
-      <div className="m-4">
+      <div className="w-full flex items-center justify-start mb-4">
         {!isConnected ? (
           <button 
             onClick={handleConnectPrescription}
-            className="px-4 py-2 bg-green-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-105"
+            className="px-4 py-2 bg-teal-600 text-white rounded m-2 transition transform duration-150 hover:scale-105"
           >
             Connect to Prescription
           </button>
         ) : (
           <button 
             onClick={handleDisconnect}
-            className="px-4 py-2 bg-red-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-105"
+            className="px-4 py-2 bg-rose-500 text-white rounded m-2 transition transform duration-150 hover:scale-105"
           >
             Disconnect
           </button>
         )}
-        <span className="ml-4 text-lg font-semibold">{connectionStatus}</span>
+        <span className="ml-4 text-lg font-semibold text-slate-700">{connectionStatus}</span>
       </div>
 
-      <table className="w-9/12 border border-gray-300 mx-auto">
-        <thead>
+      <table className="w-full border border-gray-200 rounded overflow-hidden">
+        <thead className="bg-gray-50">
           <tr>
-            <th className="px-4 py-2 border">Medication</th>
-            <th className="px-4 py-2 border">Daily Dose</th>
-            <th className="px-4 py-2 border">Taken Today</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">Medication</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">Daily Dose</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">Taken Today</th>
           </tr>
         </thead>
 
         <tbody>
-          {drugs.map((drug, index) => (
-            <tr key={index}>
-              <td className="px-4 py-2 border">{drug.drug}</td>
-              <td className="px-4 py-2 border">{drug.dosage}</td>
-              <td className="px-4 py-2 border">{`${drug.taken} / ${drug.dosage} ${drug.unit}`}</td>
+          {Array.isArray(drugs) && drugs.map((drug, index) => (
+            <tr key={index} className="odd:bg-white even:bg-slate-50">
+              <td className="px-4 py-3 border-b border-gray-100 text-slate-700">{drug.drug}</td>
+              <td className="px-4 py-3 border-b border-gray-100 text-slate-700">{drug.dosage}</td>
+              <td className="px-4 py-3 border-b border-gray-100 text-slate-700">{`${drug.taken} / ${drug.dosage} ${drug.unit}`}</td>
             </tr>
           ))}
         </tbody>
