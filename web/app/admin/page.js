@@ -44,18 +44,34 @@ export default function Admin() {
 
     return (
         <div className="min-h-screen bg-slate-50 p-10 font-sans text-slate-900">
-            <title>
-                Admin Page
-            </title>
-            <h1 className="text-3xl font-semibold text-slate-800 mb-6">
-                Add a prescription to get started.
-            </h1>
-             <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6">
-                    <h1 className="text-lg font-medium text-teal-700">{doctorName.name}</h1>
+            <title>Admin Page</title>
+            <h1 className="text-3xl font-semibold text-slate-800 mb-6">Add a prescription to get started.</h1>
+
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Left: Controls / Add prescription card */}
+                <div className="md:col-span-1 bg-white shadow-md rounded-lg p-6">
+                    <h2 className="text-lg font-medium text-teal-700 mb-3">{doctorName?.name || "Doctor"}</h2>
                     {console.log("DRN", doctorName)}
-                    <Form name={"Doctor name"} handleSub={changeDoc}>Form</Form>
-                    <p className="text-sm font-semibold text-slate-600 mt-4">PATIENTS</p>
-                     <Form name={"Patient name"} handleSub={((io) => ping('newuser', {username: io, doctor: doctorName}))}>Form</Form>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm text-slate-600 mb-1">Doctor</label>
+                            <div className="w-full">
+                                <Form name={"Doctor name"} handleSub={changeDoc}>Form</Form>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm text-slate-600 mb-1">Add patient</label>
+                            <div className="w-full">
+                                <Form name={"Patient name"} handleSub={((io) => ping('newuser', {username: io, doctor: doctorName}))}>Form</Form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right: Patient list */}
+                <div className="md:col-span-2">
+                    <p className="text-sm font-semibold text-slate-600 mb-4">PATIENTS</p>
                     {db.map( (item, index) => {
                         console.log("DBITEM", item)
                         const json = JSON.parse(item.user)
@@ -69,7 +85,8 @@ export default function Admin() {
                             </div>
                         );
                     })}
-             </div>
+                </div>
+            </div>
         </div>
     )
 }
