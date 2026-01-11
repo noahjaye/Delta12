@@ -1,20 +1,12 @@
 "use client";
 import React, { useState } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
+import ping from "../functions/ping.js"
+import List from '../components/many.js';
 
 export default function User(props) {
   
-  async function ping(url, data) {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/${url}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      }
-    );
-    console.log(await res.json());
-  }
+  
   
   // Drug name, taken today, daily dose, dose unit
   const [username, setUsername] = useState(props.userNameExternal)
@@ -81,4 +73,3 @@ export default function User(props) {
     </div>
   )
 }
-

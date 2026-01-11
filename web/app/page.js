@@ -2,17 +2,7 @@
 import React, { useEffect, useState } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000"
 export default function Home() {
-  async function ping(url, data) {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/${url}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      }
-    );
-    console.log(await res.json());
-  }
+  
   // Drug name, taken today, daily dose, dose unit
   let user = [["Tylenol", 0, 1, 'pills'], ["Vivace", 0, 3, 'grams']]
   const [drugs, setDrugs] = useState(user);

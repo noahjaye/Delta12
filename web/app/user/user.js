@@ -1,6 +1,9 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
+import ping from "../functions/ping.js"
+
+
 
 const PRESCRIPTION_SERVICE_UUID = "12345678-1280-1280-1280-676767abcdef";
 const COUNTER_CHARACTERISTIC_UUID = "87654321-1280-1280-1280-abcdef676767";

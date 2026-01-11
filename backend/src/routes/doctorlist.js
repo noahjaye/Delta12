@@ -14,13 +14,14 @@ router.post('/', async (req, res) => {
     const collection = database.collection("users")
     await dbclient.connect()
 
+    const result = await collection.findOne({ username: username })
+
     const parsed = await JSON.stringify(result)
     console.log("PARSED", parsed)
 
-    result = await collection.updateOne(
-    { username: username }, // Filter for the document
-    { $set: { drugs: drugs } } // Push a new score into the 'scores' array
-    );
+    
+
+    
 
     res.json({ user: parsed })
 

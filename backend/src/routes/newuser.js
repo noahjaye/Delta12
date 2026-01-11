@@ -12,8 +12,8 @@ router.post('/', async (req, res) => {
     console.log("RECDOC", doctor)
 
     const database = await getDb()
-    const collection = database.collection("users")
-
+    const users = database.collection("users")
+    const doctors = database.collection("doctors")
     await dbclient.connect()
 
     const user = [
@@ -21,7 +21,12 @@ router.post('/', async (req, res) => {
         "username": username
         }
     ]
-    const result = await collection.insertMany(user)
+    let result = await users.insertMany(user)
+    let docUp = [
+        { doctor: doctor},
+        { $push: {users: username} }
+    ]
+    result = await users.updateMany(docUp)
     console.log("RES", result)
     res.json({ newuser: true });
 });

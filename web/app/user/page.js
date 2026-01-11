@@ -1,5 +1,8 @@
 'use client';
 import User from "./user"
+import React, { useEffect, useState } from 'react';
+import ping from "../functions/ping.js"
+import Form from "../components/form";
 
 export default function Page() {
   const lebron = {
@@ -13,6 +16,8 @@ export default function Page() {
   return (
     <div>
       <User userNameExternal={lebron.username} drugsExternal={lebron.drugs} />
+      <Form name={"Patient name"}>Form</Form>
+      
     </div>
   )
 }
