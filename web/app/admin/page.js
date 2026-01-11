@@ -1,5 +1,6 @@
-// "use client";
-// import { useState } from "react";
+"use client";
+import { useState, useRef } from "react";
+import User from "../admin/user.js"
 
 // BLE service UUIDs
 const SERVICE = "12345678-1280-1280-1280-676767abcdef";
@@ -81,6 +82,22 @@ export default function Admin() {
         }
     }
 
+      const lebron = {
+    username: "LeBron",
+    drugs: [
+      ["Tylenol", 0, 1, "pills"],
+      ["Vivace", 0, 3, "grams"]
+    ]
+  }
+
+  const drake = {
+    username: "Drake",
+    drugs: [
+      ["Advil", 0, 2, "pills"],
+      ["Omega 3", 0, 1, "capsules"]
+    ]
+  }
+
     return (
         <div className="p-10">
             <title>
@@ -94,7 +111,7 @@ export default function Admin() {
                     Connect to Prescription
                 </button>
             </div>
-            <table className="w-9/12 border border-gray-300 m-10 mx-auto">
+            {/* <table className="w-9/12 border border-gray-300 m-10 mx-auto">
                 <thead>
                     <tr>
                         <th className="px-4 py-2 border">User</th>
@@ -121,7 +138,11 @@ export default function Admin() {
                         </td>
                     </tr>
                 </tbody>
-            </table>
+            </table> */}
+             <div>
+                   <User userNameExternal={lebron.username} drugsExternal={lebron.drugs} />
+                   <User userNameExternal={drake.username} drugsExternal={drake.drugs} />
+             </div>
         </div>
     )
 }
