@@ -44,20 +44,7 @@ export default function User(props) {
     );
     console.log(await res.json()); // Drug name, taken today, daily dose, dose unit
   }
-function updrug(index, delta, uname) {
-    console.log("Delta", delta)
-    setDrugs(prev =>
-      prev.map((drug, index) =>
-        
-        index === index
-          ? {
-              ...drug,
-              taken: Math.max(0, parseInt(drug.taken) + delta)
-            }
-          : drug
-      ),
-      ping('updatedrugs', {username: uname, drugs: drugs}))
-  }
+
   async function handleConnectPrescription() {
     try {
       setConnectionStatus("Searching for device...");
@@ -74,13 +61,15 @@ function updrug(index, delta, uname) {
 
       const service = await gatt.getPrimaryService(PRESCRIPTION_SERVICE_UUID);
       bleServiceRef.current = service;
+
       const counterChar = await service.getCharacteristic(COUNTER_CHARACTERISTIC_UUID);
       counterCharRef.current = counterChar;
 
       // Handle initial value
       const initialValue = await counterChar.readValue();
-      const val1 = initialValue.getUint32(0, true);
-      const val2 = initialValue.getUint32(4, true);
+      const tylenolValue = initialValue.getUint32(0, true);
+      const vivaceValue = initialValue.getUint32(4, true);
+      
       // setDrugs((prev) => {
       //   const updated = prev.map((drug, index) => {
       //     if (index === 0) return [drug.drug, drug.dosage, drug.taken, drug.unit];
@@ -93,18 +82,10 @@ function updrug(index, delta, uname) {
       await counterChar.startNotifications();
       
       notificationHandlerRef.current = (event) => {
-        console.log("No")
         const dataView = event.target.value;
-        const val1 = dataView.getUint32(0, true);
-        const val2 = dataView.getUint32(4, true);
+        const tylenolValue = dataView.getUint32(0, true);
+        const vivaceValue = dataView.getUint32(4, true);
 
-        //!
-        if (val1) {
-        updrug(0, 1, username)
-        }
-        if (val2) {
-          updrug(1, 1, username)
-        }
         // Update both drugs with their respective counter values
         // setDrugs((prev) => {
         //   const updated = prev.map((drug, index) => {
@@ -126,7 +107,7 @@ function updrug(index, delta, uname) {
       setIsConnected(false);
     }
   }
-  
+
   function handleDisconnect() {
     if (bleDeviceRef.current) {
       if (counterCharRef.current && notificationHandlerRef.current) {
