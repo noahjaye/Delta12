@@ -3,8 +3,20 @@ import React, { useEffect, useState } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
 
 
+
+
 export default function User(props) {
-  
+  const [username, setUsername] = useState(props.userNameExternal)
+  const [drugs, setDrugs] = useState(props.drugsExternal);
+
+  useEffect(() => {
+
+    console.log("frugs updated:", drugs);
+    ping("updatedrugs", {username: username, drugs: drugs})
+    
+  }, [drugs]);
+
+
   async function ping(url, data) {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/${url}`,
@@ -17,19 +29,19 @@ export default function User(props) {
     console.log(await res.json());
   }
   // Drug name, taken today, daily dose, dose unit
-  const [username, setUsername] = useState(props.userNameExternal)
-  const [drugs, setDrugs] = useState(props.drugsExternal);
+  
   
 
-  function handleTrack(i) {
+  async function handleTrack(i) {
   setDrugs((prev) => {
     const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
     // const updated = [...prev];
     updated[i][1] = updated[i][1] + 1; // increment takenToday
     console.log("USERNAME", username)
+    console.log("DRUGS", drugs)
     return updated;
   });
-  ping("updatedrugs", {username: username, drugs: drugs[0]})
+  console.log("UPdated", drugs)
 
 }
 
