@@ -5,8 +5,8 @@ import dbclient from '../lib/db.js'
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-    
-    const drug = req.body.drug
+    const username = req.body.username
+    const drugs = req.body.drugs
     console.log("RECEIVEDDRUG", drug)
     const dbName = "myDatabase"
     const collectionName = "users"
@@ -18,8 +18,8 @@ router.post('/', async (req, res) => {
 
 
     const result = await collection.updateOne(
-    { username: "Jameson" }, // Filter for the document
-    { $set: { drugs: drug } } // Push a new score into the 'scores' array
+    { username: username }, // Filter for the document
+    { $set: { drugs: drugs } } // Push a new score into the 'scores' array
     );
     console.log("RES", result)
     res.json({ drugs: true });
