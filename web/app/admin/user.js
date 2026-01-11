@@ -7,8 +7,6 @@ import List from '../components/many.js';
 
 export default function User(props) {
   
-  
-  
   // Drug name, taken today, daily dose, dose unit
   const [username, setUsername] = useState(props.userNameExternal)
   const [drugs, setDrugs] = useState(props.drugsExternal);

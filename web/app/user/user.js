@@ -19,7 +19,7 @@ export default function User(props) {
   const notificationHandlerRef = useRef(null);
 
   useEffect(() => {
-    console.log("frugs updated:", drugs);
+    console.log("drugs updated:", drugs);
     ping("updatedrugs", {username: username, drugs: drugs})
   }, [drugs]);
 
@@ -131,7 +131,7 @@ export default function User(props) {
       <div className="m-4">
         {!isConnected ? (
           <button 
-            //onClick={handleConnectPrescription}
+            onClick={handleConnectPrescription}
             className="px-4 py-2 bg-green-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-105"
           >
             Connect to Prescription
