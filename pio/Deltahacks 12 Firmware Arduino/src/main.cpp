@@ -3,8 +3,9 @@
 #include <CurieBLE.h>
 #include <EEPROM.h>
 
-#define TOUCH_PIN 3
-#define REFRESH_RATE 60 // in Hz
+#define TOUCH_PIN_MED1 3  // Tylenol
+#define TOUCH_PIN_MED2 4  // Vivace (reserved for future use)
+#define REFRESH_RATE 60   // in Hz
 
 rgb_lcd lcd;
 
@@ -12,7 +13,8 @@ BLEPeripheral pillBottle;
 BLEService counterService("12345678-1280-1280-1280-676767abcdef");
 BLECharacteristic commandCharacteristic("12345678-1280-1280-1280-abcdefabcdef", BLEWrite, 1);
 BLEUnsignedIntCharacteristic counterCharacteristic("87654321-1280-1280-1280-abcdef676767", BLERead | BLENotify);
-unsigned int counterValue = 0;
+unsigned int tylenolCounter = 0;  // First med
+unsigned int vivaceCounter = 0;   // Second med
 
 bool touchState = LOW;
 bool lastTouchState = LOW;
@@ -30,11 +32,12 @@ void setup() {
     pillBottle.addAttribute(counterService);
     pillBottle.addAttribute(counterCharacteristic);
     pillBottle.addAttribute(commandCharacteristic);
-    counterCharacteristic.setValue(counterValue);
+    counterCharacteristic.setValue(tylenolCounter);
     pillBottle.begin();
     
-    // Initialize touch sensor pin
-    pinMode(TOUCH_PIN, INPUT);
+    // Initialize touch sensor pins
+    pinMode(TOUCH_PIN_MED1, INPUT);
+    pinMode(TOUCH_PIN_MED2, INPUT);
 
     // Initialize Serial for debugging
     Serial.begin(9600);
@@ -52,24 +55,27 @@ void loop() {
         return;
     }
 
-    // Read touch sensor state
-    touchState = digitalRead(TOUCH_PIN);
+    // Read touch sensor state for Med 1 (Tylenol)
+    touchState = digitalRead(TOUCH_PIN_MED1);
 
-    // Update LCD timer
+    // Display Med 1 (Tylenol) on line 0
     lcd.setCursor(0, 0);
-    lcd.print(millis() / 1000);
-    lcd.print(" s");
+    lcd.print("Tylenol: ");
+    lcd.print(tylenolCounter);
+    if (tylenolCounter < 10) lcd.print(" "); // Padding for single digit
 
-    // Update LCD Dose counter
+    // Display Med 2 (Vivace) on line 1
     lcd.setCursor(0, 1);
-    lcd.print("Doses: " + String(counterValue) + "   ");
+    lcd.print("Vivace: ");
+    lcd.print(vivaceCounter);
+    if (vivaceCounter < 10) lcd.print("  "); // Padding for single digit
 
     if (touchState != lastTouchState) {
-        // Touched
+        // Touched - only update Tylenol (first med)
         if (touchState == HIGH) {
-            counterValue++;
-            counterCharacteristic.setValue(counterValue);
-            Serial.println("Doses: " + String(counterValue));
+            tylenolCounter++;
+            counterCharacteristic.setValue(tylenolCounter);
+            Serial.println("Tylenol doses: " + String(tylenolCounter));
         } 
 
         lastTouchState = touchState;
@@ -77,13 +83,13 @@ void loop() {
 
     if (commandCharacteristic.written()) {
         uint8_t cmd = commandCharacteristic.value()[0];
-        if (cmd == 1) { // Decrement command
-            if (counterValue > 0) counterValue--;
-            counterCharacteristic.setValue(counterValue);
+        if (cmd == 1) { // Decrement Tylenol
+            if (tylenolCounter > 0) tylenolCounter--;
+            counterCharacteristic.setValue(tylenolCounter);
         }
-        else if (cmd == 2) { // Increment command
-            counterValue++;
-            counterCharacteristic.setValue(counterValue);
+        else if (cmd == 2) { // Increment Tylenol
+            tylenolCounter++;
+            counterCharacteristic.setValue(tylenolCounter);
         }
     }
 }
