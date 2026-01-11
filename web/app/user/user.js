@@ -33,21 +33,93 @@ export default function User(props) {
     };
   }, [isConnected]);
 
-  
-  // Drug name, taken today, daily dose, dose unit
-  
-  
+  async function ping(url, data) {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/${url}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }
+    );
+    console.log(await res.json()); // Drug name, taken today, daily dose, dose unit
+  }
 
-  async function handleTrack(i) {
-    setDrugs((prev) => {
-      const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
-      // const updated = [...prev];
-      updated[i][1] = updated[i][1] + 1; // increment takenToday
-      console.log("USERNAME", username)
-      console.log("DRUGS", drugs)
-      return updated;
-    });
-    console.log("Updated", drugs)
+  async function handleConnectPrescription() {
+    try {
+      setConnectionStatus("Searching for device...");
+      
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [
+          { services: [PRESCRIPTION_SERVICE_UUID] }
+        ]
+      });
+
+      setConnectionStatus("Connecting...");
+      const gatt = await device.gatt.connect();
+      bleDeviceRef.current = device;
+
+      const service = await gatt.getPrimaryService(PRESCRIPTION_SERVICE_UUID);
+      bleServiceRef.current = service;
+
+      const counterChar = await service.getCharacteristic(COUNTER_CHARACTERISTIC_UUID);
+      counterCharRef.current = counterChar;
+
+      // Handle initial value
+      const initialValue = await counterChar.readValue();
+      const tylenolValue = initialValue.getUint32(0, true);
+      const vivaceValue = initialValue.getUint32(4, true);
+      console.log("Initial values - Tylenol:", tylenolValue, "Vivace:", vivaceValue);
+      
+      setDrugs((prev) => {
+        const updated = prev.map((drug, index) => {
+          if (index === 0) return [drug[0], tylenolValue, drug[2], drug[3]];
+          if (index === 1) return [drug[0], vivaceValue, drug[2], drug[3]];
+          return drug;
+        });
+        return updated;
+      });
+
+      // Setup notifications for counter characteristic updates
+      await counterChar.startNotifications();
+      
+      notificationHandlerRef.current = (event) => {
+        const dataView = event.target.value;
+        const tylenolValue = dataView.getUint32(0, true);
+        const vivaceValue = dataView.getUint32(4, true);
+        console.log("Updated values - Tylenol:", tylenolValue, "Vivace:", vivaceValue);
+
+        // Update both drugs with their respective counter values
+        setDrugs((prev) => {
+          const updated = prev.map((drug, index) => {
+            if (index === 0) return [drug[0], tylenolValue, drug[2], drug[3]];
+            if (index === 1) return [drug[0], vivaceValue, drug[2], drug[3]];
+            return drug;
+          });
+          return updated;
+        });
+      };
+
+      counterChar.addEventListener('characteristicvaluechanged', notificationHandlerRef.current);
+
+      setIsConnected(true);
+      setConnectionStatus("Connected to prescription device");
+    } catch (error) {
+      console.error("BLE Connection error:", error);
+      setConnectionStatus("Failed to connect: " + error.message);
+      setIsConnected(false);
+    }
+  }
+
+  function handleDisconnect() {
+    if (bleDeviceRef.current) {
+      if (counterCharRef.current && notificationHandlerRef.current) {
+        counterCharRef.current.removeEventListener('characteristicvaluechanged', notificationHandlerRef.current);
+      }
+      bleDeviceRef.current.gatt.disconnect();
+      setIsConnected(false);
+      setConnectionStatus("Disconnected");
+    }
   }
 
   return (
@@ -79,9 +151,8 @@ export default function User(props) {
         <thead>
           <tr>
             <th className="px-4 py-2 border">Medication</th>
-            <th className="px-4 py-2 border">Dosage</th>
+            <th className="px-4 py-2 border">Daily Dose</th>
             <th className="px-4 py-2 border">Taken Today</th>
-            <th className="px-4 py-2 border">Count</th>
           </tr>
         </thead>
 
@@ -91,15 +162,6 @@ export default function User(props) {
               <td className="px-4 py-2 border">{drug[0]}</td>
               <td className="px-4 py-2 border">{drug[2]}</td>
               <td className="px-4 py-2 border">{`${drug[1]} / ${drug[2]} ${drug[3]}`}</td>
-
-              <td className="px-4 py-2 border">
-                <button
-                  className="px-3 py-1 bg-blue-500 text-white rounded"
-                  onClick={() => handleTrack(index)}
-                >
-                  Track
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>

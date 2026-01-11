@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <rgb_lcd.h>
 #include <CurieBLE.h>
-#include <EEPROM.h>
 #include <CurieTime.h>
 #include <ctime>
 
@@ -13,16 +12,16 @@ rgb_lcd lcd;
 
 BLEPeripheral pillBottle;
 BLEService counterService("12345678-1280-1280-1280-676767abcdef");
-BLEUnsignedIntCharacteristic counterCharacteristic("87654321-1280-1280-1280-abcdef676767", BLERead | BLENotify);
+BLECharacteristic counterCharacteristic("87654321-1280-1280-1280-abcdef676767", BLERead | BLENotify, 8);  // 8 bytes for 2 unsigned ints
 unsigned int tylenolCounter = 0;  // First med
 unsigned int vivaceCounter = 0;   // Second med
 
-bool touchState = LOW;
-bool lastTouchState = LOW;
+bool touchStates[2] = {LOW, LOW};
+bool lastTouchStates[2] = {LOW, LOW};
 
 unsigned long lastRefreshTime = 0;
 unsigned long lastResetTime = 0;
-const unsigned long DAY_LENGTH = 120000; // 2 minutes for testing (in milliseconds)
+const unsigned long DAY_LENGTH = 30000; // 30s for testing (in milliseconds)
 
 void setup() {
     lcd.begin(16, 2); // Initialize a 16x2 LCD
@@ -34,7 +33,13 @@ void setup() {
     pillBottle.setAdvertisedServiceUuid(counterService.uuid());
     pillBottle.addAttribute(counterService);
     pillBottle.addAttribute(counterCharacteristic);
-    counterCharacteristic.setValue(tylenolCounter);
+    
+    // Initialize characteristic with both counters (8 bytes: 4 bytes tylenol + 4 bytes vivace)
+    unsigned char counterValues[8];
+    memcpy(&counterValues[0], &tylenolCounter, 4);
+    memcpy(&counterValues[4], &vivaceCounter, 4);
+    counterCharacteristic.setValue(counterValues, 8);
+    
     pillBottle.begin();
     
     // Initialize touch sensor pins
@@ -65,14 +70,21 @@ void loop() {
         tylenolCounter = 0;
         vivaceCounter = 0;
         lastResetTime = millis();
-        counterCharacteristic.setValue(tylenolCounter);
+        
+        // Update BLE characteristic with both reset values
+        unsigned char counterValues[8];
+        memcpy(&counterValues[0], &tylenolCounter, 4);
+        memcpy(&counterValues[4], &vivaceCounter, 4);
+        counterCharacteristic.setValue(counterValues, 8);
+        
         Serial.println("Day reset! Counters reset to 0.");
     }
 
     Serial.println(millis());
 
-    // Read touch sensor state for Med 1 (Tylenol)
-    touchState = digitalRead(TOUCH_PIN_MED1);
+    // Read touch sensor states for both medications
+    touchStates[0] = digitalRead(TOUCH_PIN_MED1);  // Tylenol
+    touchStates[1] = digitalRead(TOUCH_PIN_MED2);  // Vivace
 
     // Display Med 1 (Tylenol) on line 0
     lcd.setCursor(0, 0);
@@ -86,16 +98,40 @@ void loop() {
     lcd.print(vivaceCounter);
     lcd.print("/3");
 
-    if (touchState != lastTouchState) {
-        // Touched - only update Tylenol (first med)
-        if (touchState == HIGH) {
+    // Handle touch sensor for Med 1 (Tylenol)
+    if (touchStates[0] != lastTouchStates[0]) {
+        if (touchStates[0] == HIGH) {
             if (tylenolCounter < 1) {  // Daily dosage limit for Tylenol is 1
                 tylenolCounter++;
-                counterCharacteristic.setValue(tylenolCounter);
+                
+                // Update BLE characteristic with both values
+                unsigned char counterValues[8];
+                memcpy(&counterValues[0], &tylenolCounter, 4);
+                memcpy(&counterValues[4], &vivaceCounter, 4);
+                counterCharacteristic.setValue(counterValues, 8);
+                
                 Serial.println("Tylenol doses: " + String(tylenolCounter));
             }
-        } 
-
-        lastTouchState = touchState;
+        }
+        lastTouchStates[0] = touchStates[0];
     }
+
+    // Handle touch sensor for Med 2 (Vivace)
+    if (touchStates[1] != lastTouchStates[1]) {
+        if (touchStates[1] == HIGH) {
+            if (vivaceCounter < 3) {  // Daily dosage limit for Vivace is 3
+                vivaceCounter++;
+                
+                // Update BLE characteristic with both values
+                unsigned char counterValues[8];
+                memcpy(&counterValues[0], &tylenolCounter, 4);
+                memcpy(&counterValues[4], &vivaceCounter, 4);
+                counterCharacteristic.setValue(counterValues, 8);
+                
+                Serial.println("Vivace doses: " + String(vivaceCounter));
+            }
+        }
+        lastTouchStates[1] = touchStates[1];
+    }
+    
 }
