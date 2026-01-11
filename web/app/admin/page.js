@@ -16,6 +16,7 @@ export default function Admin() {
   });
     const [doctorName, changeDoc] = useState("")
     const [db, setDb] = useState([]);
+    
     useEffect(() =>  {
         ping("newdoctor", {username: doctorName})
         let docs

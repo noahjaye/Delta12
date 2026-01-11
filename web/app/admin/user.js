@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useState } from 'react';
+import React, { use, useState, useEffect } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
 import ping from "../functions/ping.js"
 import List from '../components/many.js';
@@ -15,6 +15,8 @@ export default function User(props) {
   const [drug, setDrug] = useState()
   const [dosage, setDosage] = useState()
   const [unit, setUnit] = useState()
+
+
   console.log("Userdrugs", drugs)
   function makeChangeHandler(setter) {
     return function(e) {
@@ -23,23 +25,25 @@ export default function User(props) {
       setter(value);
     }
   }
-  async function incrementHandleTrack(i) {
-    setDrugs(prev => {
-      const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
-      // const updated = [...prev];
-      updated[i][1]++; // increment takenToday
-      return updated;
-    });
+  function handleTrackMaker(delta, uname) {
+    return function (i) {
+      setDrugs(prev =>
+        prev.map((drug, index) =>
+          
+          index === i
+            ? {
+                ...drug,
+                dosage: Math.max(0, parseInt(drug.dosage) + delta)
+              }
+            : drug
+        ),
+        ping('updatedrugs', {username: uname, drugs: drugs})
+      )
+    };
   }
+
   
-  async function decrementHandleTrack(i) {
-    setDrugs(prev => {
-      const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
-      // const updated = [...prev];
-      updated[i][1] -= updated[i][1] > 0 ? 1 : 0; // decrement takenToday
-      return updated;
-    });
-  }
+  
 
   return (
     <div className="flex flex-col align-middle">
@@ -59,26 +63,28 @@ export default function User(props) {
     
     <tbody>
       {
-      
-      drugs?.map((drug, index) => (
+        console.log("DRUGS", drugs)
+      }
+      {
+        
+      Array.isArray(drugs) && drugs.map((drug, index) => {
+        console.log("MAPPEDRUG", drug)
+        return(
         <tr key={index}>
-        <td className="px-4 py-2 border">{drug[0]}</td>
-        <td className="px-4 py-2 border">{drug[2]}</td>
-        <td className="px-4 py-2 border">{`${drug[1]} / ${drug[2]} ${drug[3]}`}</td>
+        <td className="px-4 py-2 border">{drug?.drug}</td>
+        <td className="px-4 py-2 border">{drug?.dosage}</td>
+        <td className="px-4 py-2 border">{`${drug?.taken} / ${drug?.dosage} ${drug?.unit}`}</td>
         
         <td className="px-4 py-2 border flex justify-center">
-          <button onClick={() => incrementHandleTrack(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110 size-10">
+          <button onClick={() => handleTrackMaker(1, username)(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110 size-10">
             +
           </button>
-          <button onClick={() => decrementHandleTrack(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110 size-10">
+          <button onClick={() => handleTrackMaker(-1, username)(index)} className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110 size-10">
             -
-          </button>
-          <button className="px-3 py-1 bg-blue-500 text-white rounded m-2 transition duration-300 ease-in-out hover:scale-110">
-            Edit
           </button>
         </td>
         </tr>
-      ))}
+      )})}
     </tbody>
     
     </table>
