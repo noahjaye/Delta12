@@ -12,7 +12,7 @@ export default function Admin() {
     { LeTwo: [{ Tylenol: 4 }, { Vivace: 2 }] },
     ]);
 
-    const cmdCharacteristicRef = addref(null);
+    const cmdCharacteristicRef = useRef(null);
 
     async function connectToDevice() {
         try {
