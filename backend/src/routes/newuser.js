@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     
-    const username = req.body.username
-    const doctor = req.body.doctor
+    const username = req.body.username.name
+    const doctor = req.body.doctor.name
     console.log("RECEIVEDUSERNAME", username)
     console.log("RECDOC", doctor)
 
@@ -22,11 +22,11 @@ router.post('/', async (req, res) => {
         }
     ]
     let result = await users.insertMany(user)
-    let docUp = [
-        { doctor: doctor},
-        { $push: {users: username} }
-    ]
-    result = await users.updateMany(docUp)
+    result = await doctors.updateMany(
+        { username: doctor},
+        {$push: {users: username} },
+        {upsert: true}
+    ),
     console.log("RES", result)
     res.json({ newuser: true });
 });

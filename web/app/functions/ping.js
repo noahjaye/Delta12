@@ -7,7 +7,9 @@ async function ping(url, data) {
         body: JSON.stringify(data)
       }
     );
-    console.log(await res.json());
+    let json = await res.json();
+    console.log("JOSN", json);
+    return json;
   }
 
 export default ping

@@ -7,9 +7,9 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     const username = req.body.username
-    const drugs = req.body.drugs
-    console.log("RECEIVEDDRUG", drugs)
-
+    let drugs = req.body.drugs
+    console.log("RECEIVEDDOCDRUG", drugs, typeof(drugs))
+    drugs.taken = 0
     const database = await getDb()
     const collection = database.collection("users")
 
@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
 
     const result = await collection.updateOne(
     { username: username }, 
-    { $set: { drugs: drugs } } 
+    { $push: { drugs: drugs } } 
     );
     console.log("RES", result)
     res.json({ drugs: true });

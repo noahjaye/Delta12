@@ -5,8 +5,13 @@ import dotenv from 'dotenv';
 import newuser from './routes/newuser.js'
 import updatedrugs from './routes/updatedrugs.js'
 import getuser from './routes/getuser.js'
+import doctorlist from './routes/doctorlist.js'
+import newdoctor from './routes/newdoctor.js'
+import doctordrugs from './routes/doctordrugs.js'
 
 dotenv.config({path: './secrets/backend.env'});
+
+
 
 const app = express();
 
@@ -24,7 +29,9 @@ let counterValue = 0;
 app.use('/newuser', newuser)
 app.use('/updatedrugs', updatedrugs)
 app.use('/getuser', getuser) 
-
+app.use('/doctorlist', doctorlist)
+app.use('/newdoctor', newdoctor)
+app.use('/doctordrugs', doctordrugs)
 
 app.use(express.urlencoded({ extended: true }));
 

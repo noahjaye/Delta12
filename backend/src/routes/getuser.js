@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     
-    const username = req.body.username
+    const username = req.body.username.name
     console.log("grabbinguser", username)
 
     const database = await getDb()

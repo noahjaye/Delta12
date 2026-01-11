@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
 import ping from "../functions/ping.js"
 import List from '../components/many.js';
+
 
 export default function User(props) {
   
@@ -11,7 +12,16 @@ export default function User(props) {
   // Drug name, taken today, daily dose, dose unit
   const [username, setUsername] = useState(props.userNameExternal)
   const [drugs, setDrugs] = useState(props.drugsExternal);
-  
+  const [drug, setDrug] = useState()
+  const [dosage, setDosage] = useState()
+  const [unit, setUnit] = useState()
+  function makeChangeHandler(setter) {
+    return function(e) {
+      const { name, value } = e.target;
+      console.log("Setting with a handler", name, value)
+      setter(value);
+    }
+  }
   async function incrementHandleTrack(i) {
     setDrugs(prev => {
       const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
@@ -69,7 +79,13 @@ export default function User(props) {
     </tbody>
     
     </table>
-      <button className="px-3 py-1 bg-blue-500 text-white rounded mx-auto my-5 transition duration-300 ease-in-out hover:scale-110 length-50" onClick={() => ping('updatedrugs', {username: "Bronny", drugs: drugs})}>Add Drugs</button>
+      <p>Add drugs below: </p>
+      <input className="bg-white text-black" onChange={makeChangeHandler(setDrug)}></input>
+      <p>And drug dosage:</p>
+      <input className="bg-white text-black" onChange={makeChangeHandler(setDosage)}></input>
+      <p>And also units:</p>
+      <input className="bg-white text-black" onChange={makeChangeHandler(setUnit)}></input>
+      <button className="px-3 py-1 bg-blue-500 text-white rounded mx-auto my-5 transition duration-300 ease-in-out hover:scale-110 length-50" onClick={() => ping('doctordrugs', {username, drugs: [{drug: drug, dosage: dosage, unit: unit}]})}>Add Drugs</button>
     </div>
   )
 }

@@ -12,9 +12,10 @@ export async function getDb() {
   return dbclient.db("myDatabase");
 }
 
+
 export {dbclient};
 
 process.on("SIGINT", async () => {
-  await client.close();
+  await dbclient.close();
   process.exit(0);
 });

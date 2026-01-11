@@ -1,6 +1,8 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import User from "../admin/user.js"
+import ping from "../functions/ping.js"
+import Form from "../components/form.js";
 
 // BLE service UUIDs
 const SERVICE = "12345678-1280-1280-1280-676767abcdef";
@@ -8,13 +10,53 @@ const CHARACTERISTIC = "87654321-1280-1280-1280-abcdef676767";
 const CMD_CHARACTERISTIC = "12345678-1280-1280-1280-abcdefabcdef";
 
 export default function Admin() {
-    const [db, setDb] = useState([
-    { LeBron: [{ Tylenol: 0 }, { Vivace: 3 }] },
-    { LeTwo: [{ Tylenol: 4 }, { Vivace: 2 }] },
-    ]);
-    
+    const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+  });
+    const [doctorName, changeDoc] = useState("")
+    const [db, setDb] = useState([]);
+    useEffect(() =>  {
+        ping("newdoctor", {username: doctorName})
+        let docs
+        const interval = setInterval(() => {
+
+            ping("doctorlist", {username: doctorName}).then((thing) => {
+                return thing.users
+            }).then((thing2) => {
+                let parse = JSON.parse(thing2)
+                docs = parse
+                const promises = docs.map((username) => ping("getuser", { username }));
+                Promise.all(promises).then((results) => {
+
+                    setDb(results);
+                });
+                
+            })
+            
+            
+            
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, [doctorName])
     const cmdCharacteristicRef = useRef(null);
 
+
+    function handleChange(e) {
+        console.log()
+        const { name, value } = e.target;
+        setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        }));
+    }
+
+    function handleSubmit(e) {
+        e.preventDefault(); // stop page reload
+        ping('newuser', {username: formData.name})
+    }
+    
     async function connectToDevice() {
         try {
             console.log("Requesting Bluetooth Device...");
@@ -56,41 +98,6 @@ export default function Admin() {
         }
     }
 
-    const incrementDosage = async () => {
-        setDb(prev => {
-            const copy = structuredClone(prev)
-            copy[0].LeBron[0].Tylenol += 1
-            return copy
-        } 
-        );
-
-        if (cmdCharacteristicRef.current) {
-            try {
-                await cmdCharacteristicRef.current.writeValue(new Uint8Array([2]));
-                console.log("Sent increment command to device");
-            } catch (error) {
-                console.error("Error sending command to device: ", error);
-            }
-        }
-    }
-    const decrementDosage = async () => {
-        setDb(prev => {
-            const copy = structuredClone(prev)
-            copy[0].LeBron[0].Tylenol -= copy[0].LeBron[0].Tylenol > 0 ? 1 : 0;
-            return copy
-        }
-        );
-
-        if (cmdCharacteristicRef.current) {
-            try {
-                await cmdCharacteristicRef.current.writeValue(new Uint8Array([1]));
-                console.log("Sent decrement command to device");
-            } catch (error) {
-                console.error("Error sending command to device: ", error);
-            }
-        }
-    }
-
       const lebron = {
     username: "LeBron",
     drugs: [
@@ -105,7 +112,7 @@ export default function Admin() {
       ["Advil", 0, 2, "pills"],
       ["Omega 3", 0, 1, "capsules"]
     ]
-  }
+    }
 
     return (
         <div className="p-10">
@@ -121,8 +128,25 @@ export default function Admin() {
                 </button>
             </div>
              <div>
-                   <User userNameExternal={lebron.username} drugsExternal={lebron.drugs} />
-                   <User userNameExternal={drake.username} drugsExternal={drake.drugs} />
+                    <h1>{doctorName.name}</h1>
+                    {console.log("DRN", doctorName)}
+                    <Form name={"Doctor name"} handleSub={changeDoc}>Form</Form>
+                    <p>PATIENTS ...-- THIS LINE NEEDS CSS </p>
+                    {db.map( (item, index) => {
+                        console.log("DBITEM", item)
+                        const parsed = JSON.parse(item.user)
+                        console.log("PA", parsed)
+                        const username = parsed.username;
+                        const drugsArray = /*item[username] | */[{ Tylenol: 49 }, { Vivace: 3 }]; // array of { drug: qty }
+
+                        return (
+                            <div key={`${username}-${index}`}>
+                            <User userNameExternal={username} drugsExternal={drugsArray}></User>
+                            </div>
+                        );
+                    })}
+
+                    <Form name={"Patient name"} handleSub={((io) => ping('newuser', {username: io, doctor: doctorName}))}>Form</Form>
              </div>
         </div>
     )

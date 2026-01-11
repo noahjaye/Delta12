@@ -7,24 +7,29 @@ import {dbclient, getDb} from '../lib/db.js'
 const router = express.Router();
 
 
+
 router.post('/', async (req, res) => {
     
     const username = req.body.username.name
-    console.log("doctorlist", username)
+    console.log("nefdoc", username)
 
     const database = await getDb()
     const collection = database.collection("doctors")
+    console.log("CDMIM")
+    const result = await collection.updateOne(
+        { username },          // existence condition
+        {
+        $setOnInsert: {
+            username
+        }
+        },
+        { upsert: true }
+    );
 
-    const result = await collection.findOne({ username: username })
-    
-    console.log("PUSERS", result.users)
-    
-    for (const x of result.users) {
-        console.log("Poopshit", x)
-    }
-    const strung = await JSON.stringify(result.users)
-   
-    res.json({ users:  strung})
+  return {
+    created: result.upsertedCount === 1
+  };
+    res.json({create: true})
 
 });
 
