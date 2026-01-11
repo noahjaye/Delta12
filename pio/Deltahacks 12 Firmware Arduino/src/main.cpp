@@ -10,8 +10,8 @@ rgb_lcd lcd;
 
 BLEPeripheral pillBottle;
 BLEService counterService("12345678-1280-1280-1280-676767abcdef");
+BLECharacteristic commandCharacteristic("12345678-1280-1280-1280-abcdefabcdef", BLEWrite, 1);
 BLEUnsignedIntCharacteristic counterCharacteristic("87654321-1280-1280-1280-abcdef676767", BLERead | BLENotify);
-BLECharacteristic commandCharacteristic("12345678-1280-1280-1280-abcdefabcdef", BLEWrite, 20);
 unsigned int counterValue = 0;
 
 bool touchState = LOW;
@@ -22,7 +22,7 @@ unsigned long lastRefreshTime = 0;
 void setup() {
     lcd.begin(16, 2); // Initialize a 16x2 LCD
     lcd.setRGB(255, 255, 255);
-    lcd.print("Hello, World!");
+    lcd.print("Initializing...");
     
     // Initialize BLE
     pillBottle.setLocalName("LeBron's Secret Stash");

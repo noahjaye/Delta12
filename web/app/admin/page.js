@@ -25,7 +25,7 @@ export default function Admin() {
             const service = await server.getPrimaryService(SERVICE);
             const characteristic = await service.getCharacteristic(CHARACTERISTIC);
             const cmdCharacteristic = await service.getCharacteristic(CMD_CHARACTERISTIC);
-            cmdCharacteristicRef = cmdCharacteristic;
+            cmdCharacteristicRef.current = cmdCharacteristic;
 
             // Initial read
             const initial = await characteristic.readValue();
