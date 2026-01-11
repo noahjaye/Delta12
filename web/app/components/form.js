@@ -1,9 +1,9 @@
 import { useState } from "react";
+import ping from "../functions/ping";
 
 function Form(props) {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
   });
 
   function handleChange(e) {
@@ -17,6 +17,7 @@ function Form(props) {
   function handleSubmit(e) {
     e.preventDefault(); // stop page reload
     console.log(formData);
+    props.handleSub(formData)
   }
 
   return (

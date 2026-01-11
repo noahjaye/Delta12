@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
 import ping from "../functions/ping.js"
-
+import List from '../components/many.js';
 
 export default function User(props) {
   
@@ -18,7 +18,7 @@ export default function User(props) {
   setDrugs(prev => {
     const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
     // const updated = [...prev];
-    updated[i][1] = updated[i][1] + 1; // increment takenToday
+    updated[i][2] = updated[i][2] + 1; // increment takenToday
     return updated;
   });
 }
@@ -27,7 +27,7 @@ export default function User(props) {
   setDrugs(prev => {
     const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
     // const updated = [...prev];
-    updated[i][1] = updated[i][1] - 1; // increment takenToday
+    updated[i][2] = updated[i][2] - 1; // increment takenToday
     return updated;
   });
 }
@@ -75,4 +75,3 @@ export default function User(props) {
     </div>
   )
 }
-

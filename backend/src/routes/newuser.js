@@ -21,7 +21,12 @@ router.post('/', async (req, res) => {
         "username": username
         }
     ]
-    const result = await users.insertMany(user)
+    let result = await users.insertMany(user)
+    let docUp = [
+        { doctor: doctor},
+        { $push: {users: username} }
+    ]
+    result = await users.updateMany(docUp)
     console.log("RES", result)
     res.json({ newuser: true });
 });

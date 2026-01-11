@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import User from "../admin/user.js"
 import ping from "../functions/ping.js"
 import Form from "../components/form.js";
@@ -16,10 +16,13 @@ export default function Admin() {
   });
 
     const [db, setDb] = useState([
-    { LeBron: [{ Tylenol: 0 }, { Vivace: 3 }] },
-    { LeTwo: [{ Tylenol: 4 }, { Vivace: 2 }] },
+    // { LeBron: [{ Tylenol: 0 }, { Vivace: 3 }] },
+    // { Leshit: [{ Tylenol: 4 }, { Vivace: 2 }] },
     ]);
-    
+    useEffect(() => {
+        ping("")
+    }, [doctorName])
+    const [doctorName, changeDoc] = useState([""])
     const cmdCharacteristicRef = useRef(null);
 
 
@@ -109,8 +112,21 @@ export default function Admin() {
                 </button>
             </div>
              <div>
-                
-                   <User userNameExternal={lebron.username} drugsExternal={lebron.drugs} />
+                    <h1>{doctorName.name}</h1>
+                    {console.log("DRN", doctorName)}
+                    <Form name={"Doctor name"} handleSub={changeDoc}>Form</Form>
+                    <p>PATIENTS ...-- THIS LINE NEEDS CSS </p>
+                    {db.map((item, index) => {
+                    const username = Object.keys(item)[0];
+                    const drugsArray = item[username]; // array of { drug: qty }
+
+                    return (
+                        <div key={username ?? index} >
+                        <User userNameExternal={username} drugsExternal={drugsArray}></User>
+                        </div>
+                    );
+                    })}
+
                     <Form name={"Patient name"}>Form</Form>
              </div>
         </div>
