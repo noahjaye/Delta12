@@ -1,7 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000"
-export default function Home() {
+process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
+
+
+export default function User(props) {
+  
   async function ping(url, data) {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/${url}`,
@@ -13,12 +16,11 @@ export default function Home() {
     );
     console.log(await res.json());
   }
+  ping('getuser', {username: "Jameson"})
   // Drug name, taken today, daily dose, dose unit
-  let user = [["Tylenol", 0, 1, 'pills'], ["Vivace", 0, 3, 'grams']]
-  const [drugs, setDrugs] = useState(user);
-  const [username, setUsername] = useState("LeBron")
+  const [username, setUsername] = useState(props.userNameExternal)
+  const [drugs, setDrugs] = useState(props.drugsExternal);
   
-
 
   function handleTrack(i) {
   setDrugs(prev => {
@@ -63,13 +65,8 @@ export default function Home() {
           </tr>
         ))}
       </tbody>
+      
     </table>
-
-      <div>
-        <button onClick={() => ping("invite")}>Invite</button>
-        <button onClick={() => ping("newuser")}>New user</button>
-        <button onClick={() => ping("login")}>Login</button>
-      </div>
     </div>
   )
 }
