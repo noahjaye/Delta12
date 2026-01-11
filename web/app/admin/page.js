@@ -1,5 +1,5 @@
-// "use client";
-// import { useState } from "react";
+"use client";
+import { useState, useRef } from "react";
 
 // BLE service UUIDs
 const SERVICE = "12345678-1280-1280-1280-676767abcdef";
@@ -125,4 +125,3 @@ export default function Admin() {
         </div>
     )
 }
-
