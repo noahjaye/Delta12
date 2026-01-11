@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000" //Remove please
-
+import ping from "../functions/ping.js"
 
 
 
@@ -17,17 +17,7 @@ export default function User(props) {
   }, [drugs]);
 
 
-  async function ping(url, data) {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/${url}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      }
-    );
-    console.log(await res.json());
-  }
+  
   // Drug name, taken today, daily dose, dose unit
   
   

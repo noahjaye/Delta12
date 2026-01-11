@@ -1,6 +1,7 @@
 'use client';
 import User from "./user"
 import React, { useEffect, useState } from 'react';
+import ping from "../functions/ping.js"
 
 export default function Page() {
 
@@ -24,7 +25,7 @@ export default function Page() {
   return (
     <div>
       <User userNameExternal={lebron.username} drugsExternal={lebron.drugs} />
-      <User userNameExternal={drake.username} drugsExternal={drake.drugs} />
+      
     </div>
   )
 }
