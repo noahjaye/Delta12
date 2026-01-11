@@ -22,12 +22,15 @@ export default function User(props) {
   
 
   function handleTrack(i) {
-  setDrugs(prev => {
+  setDrugs((prev) => {
     const updated = prev.map((drug, index) => index === i ? [...drug] : drug);
     // const updated = [...prev];
     updated[i][1] = updated[i][1] + 1; // increment takenToday
+    console.log("USERNAME", username)
     return updated;
   });
+  ping("updatedrugs", {username: username, drugs: drugs[0]})
+
 }
 
   return (

@@ -12,7 +12,7 @@ export default function Admin() {
     { LeBron: [{ Tylenol: 0 }, { Vivace: 3 }] },
     { LeTwo: [{ Tylenol: 4 }, { Vivace: 2 }] },
     ]);
-
+    
     const cmdCharacteristicRef = useRef(null);
 
     async function connectToDevice() {
@@ -105,7 +105,7 @@ export default function Admin() {
       ["Advil", 0, 2, "pills"],
       ["Omega 3", 0, 1, "capsules"]
     ]
-  }
+    }
 
     return (
         <div className="p-10">
