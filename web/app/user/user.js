@@ -69,7 +69,7 @@ export default function User(props) {
       const initialValue = await counterChar.readValue();
       const tylenolValue = initialValue.getUint32(0, true);
       const vivaceValue = initialValue.getUint32(4, true);
-      console.log("Initial values - Tylenol:", tylenolValue, "Vivace:", vivaceValue);
+      console.log(`Initial values - ${drugs[0].drug}:`, tylenolValue, `${drugs[1].drug}:`, vivaceValue);
       
       setDrugs((prev) => {
         const updated = prev.map((drug, index) => {
