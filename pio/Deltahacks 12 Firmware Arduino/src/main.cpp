@@ -29,6 +29,7 @@ void setup() {
     pillBottle.setAdvertisedServiceUuid(counterService.uuid());
     pillBottle.addAttribute(counterService);
     pillBottle.addAttribute(counterCharacteristic);
+    pillBottle.addAttribute(commandCharacteristic);
     counterCharacteristic.setValue(counterValue);
     pillBottle.begin();
     

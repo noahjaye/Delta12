@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 // BLE service UUIDs
 const SERVICE = "12345678-1280-1280-1280-676767abcdef";
@@ -12,7 +12,7 @@ export default function Admin() {
     { LeTwo: [{ Tylenol: 4 }, { Vivace: 2 }] },
     ]);
 
-    const cmdCharacteristicRef = null;
+    const cmdCharacteristicRef = useRef(null);
 
     async function connectToDevice() {
         try {
