@@ -39,7 +39,7 @@ export default function User(props) {
       return updated;
     });
   }
-  
+
   return (
     <div className="flex flex-col align-middle">
       <h1 className="flex justify-center text-5xl p-8"> 
@@ -85,7 +85,7 @@ export default function User(props) {
       <input className="bg-white text-black" onChange={makeChangeHandler(setDosage)}></input>
       <p>And also units:</p>
       <input className="bg-white text-black" onChange={makeChangeHandler(setUnit)}></input>
-      <button className="px-3 py-1 bg-blue-500 text-white rounded mx-auto my-5 transition duration-300 ease-in-out hover:scale-110 length-50" onClick={() => ping('doctordrugs', {username, drugs: [{drug: drug, dosage: dosage, unit: unit}]})}>Add Drugs</button>
+      <button className="px-3 py-1 bg-blue-500 text-white rounded mx-auto my-5 transition duration-300 ease-in-out hover:scale-110 length-50" onClick={() => ping('doctordrugs', {username:  props.userNameExternal, drugs: [{drug: drug, dosage: dosage, unit: unit}]})}>Add Drugs</button>
     </div>
   )
 }

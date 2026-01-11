@@ -138,10 +138,10 @@ export default function Admin() {
                         console.log("PA", parsed)
                         const username = parsed.username;
                         const drugsArray = /*item[username] | */[{ Tylenol: 49 }, { Vivace: 3 }]; // array of { drug: qty }
-
+                        console.log("USERNAMEEXT", username)
                         return (
                             <div key={`${username}-${index}`}>
-                            <User userNameExternal={username} drugsExternal={drugsArray}></User>
+                            <User userNameExternal={doctorName.name} drugsExternal={drugsArray}></User>
                             </div>
                         );
                     })}
