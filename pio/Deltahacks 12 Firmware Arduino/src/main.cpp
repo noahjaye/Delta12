@@ -1,155 +1,142 @@
 #include <Arduino.h>
+#include <CurieBLE.h>
 #include <Wire.h>
 #include <rgb_lcd.h>
-#include <CurieBLE.h>
-#include <CurieTime.h>
-#include <ctime>
 
-#define TOUCH_PIN_MED1 3  // Tylenol
-#define TOUCH_PIN_MED2 4  // Vivace (reserved for future use)
-#define REFRESH_RATE 50   // in Hz
+#define REFRESH_RATE 50
+#define DAY_LENGTH 30000 // 30s for testing
+#define MAX_DRUGS 2      // LIMITED by LCD + BLE payload
 
 rgb_lcd lcd;
 
+/* ---------- DRUG MODEL ---------- */
+
+struct Drug {
+  const char *name;
+  uint8_t touchPin;
+  uint8_t dailyLimit;
+  uint32_t counter;
+};
+
+Drug drugs[MAX_DRUGS] = {{"Tylenol", 3, 1, 0}, {"Vivace", 4, 3, 0}};
+
+bool touchStates[MAX_DRUGS];
+bool lastTouchStates[MAX_DRUGS];
+
+/* ---------- BLE ---------- */
+
 BLEPeripheral pillBottle;
 BLEService counterService("12345678-1280-1280-1280-676767abcdef");
-BLECharacteristic counterCharacteristic("87654321-1280-1280-1280-abcdef676767", BLERead | BLENotify, 8);  // 8 bytes for 2 unsigned ints
-unsigned int tylenolCounter = 0;  // First med
-unsigned int vivaceCounter = 0;   // Second med
 
-bool touchStates[2] = {LOW, LOW};
-bool lastTouchStates[2] = {LOW, LOW};
+/*
+  4 bytes per drug counter
+  MAX_DRUGS * 4 bytes
+*/
+BLECharacteristic counterCharacteristic("87654321-1280-1280-1280-abcdef676767",
+                                        BLERead | BLENotify, MAX_DRUGS * 4);
+
+/* ---------- TIMING ---------- */
 
 unsigned long lastRefreshTime = 0;
 unsigned long lastResetTime = 0;
-const unsigned long DAY_LENGTH = 30000; // 30s for testing (in milliseconds)
 
-// Flash the LCD backlight white a few times to indicate an error/limit
-void flashWhite(int times = 3, int onMs = 100, int offMs = 100) {
-    for (int i = 0; i < times; ++i) {
-        lcd.setRGB(255, 255, 255);
-        delay(onMs);
-        lcd.setRGB(0, 0, 0);
-        delay(offMs);
-    }
-    // leave backlight on white after flashing
-    lcd.setRGB(255, 255, 255);
+/* ---------- HELPERS ---------- */
+
+void updateBleCounters() {
+  uint8_t payload[MAX_DRUGS * 4];
+
+  for (int i = 0; i < MAX_DRUGS; i++) {
+    memcpy(&payload[i * 4], &drugs[i].counter, 4);
+  }
+
+  counterCharacteristic.setValue(payload, sizeof(payload));
 }
+
+void flashWhite(int times = 3, int onMs = 100, int offMs = 100) {
+  for (int i = 0; i < times; i++) {
+    lcd.setRGB(255, 255, 255);
+    delay(onMs);
+    lcd.setRGB(0, 0, 0);
+    delay(offMs);
+  }
+  lcd.setRGB(255, 255, 255);
+}
+
+/* ---------- SETUP ---------- */
 
 void setup() {
-    lcd.begin(16, 2); // Initialize a 16x2 LCD
-    lcd.print("Initializing...");
-    
-    // Initialize BLE
-    pillBottle.setLocalName("LeBron's Secret Stash");
-    pillBottle.setAdvertisedServiceUuid(counterService.uuid());
-    pillBottle.addAttribute(counterService);
-    pillBottle.addAttribute(counterCharacteristic);
-    
-    // Initialize characteristic with both counters (8 bytes: 4 bytes tylenol + 4 bytes vivace)
-    unsigned char counterValues[8];
-    memcpy(&counterValues[0], &tylenolCounter, 4);
-    memcpy(&counterValues[4], &vivaceCounter, 4);
-    counterCharacteristic.setValue(counterValues, 8);
-    
-    pillBottle.begin();
-    
-    // Initialize touch sensor pins
-    pinMode(TOUCH_PIN_MED1, INPUT);
-    pinMode(TOUCH_PIN_MED2, INPUT);
+  lcd.begin(16, 2);
+  lcd.print("Initializing...");
 
-    // Initialize reset timer
-    lastResetTime = millis();
+  pillBottle.setLocalName("Smart Pill Bottle");
+  pillBottle.setAdvertisedServiceUuid(counterService.uuid());
+  pillBottle.addAttribute(counterService);
+  pillBottle.addAttribute(counterCharacteristic);
 
-    // Initialize Serial for debugging
-    Serial.begin(9600);
-    Serial.println("Setup complete.");
-    
-    delay(1000);
-    lcd.clear();
-    delay(500);
+  updateBleCounters();
+  pillBottle.begin();
+
+  for (int i = 0; i < MAX_DRUGS; i++) {
+    pinMode(drugs[i].touchPin, INPUT);
+    touchStates[i] = LOW;
+    lastTouchStates[i] = LOW;
+  }
+
+  lastResetTime = millis();
+
+  Serial.begin(9600);
+  Serial.println("Setup complete");
+
+  delay(1000);
+  lcd.clear();
 }
 
+/* ---------- LOOP ---------- */
+
 void loop() {
-    // Regular refresh rate defined in REFRESH_RATE
-    if (millis() - lastRefreshTime >= (1000 / REFRESH_RATE)) {
-        lastRefreshTime = millis();
-        return;
+  if (millis() - lastRefreshTime < (1000 / REFRESH_RATE))
+    return;
+  lastRefreshTime = millis();
+
+  /* Daily reset */
+  if (millis() - lastResetTime >= DAY_LENGTH) {
+    for (int i = 0; i < MAX_DRUGS; i++) {
+      drugs[i].counter = 0;
+    }
+    updateBleCounters();
+    lastResetTime = millis();
+    Serial.println("Daily reset");
+  }
+
+  /* Read inputs */
+  for (int i = 0; i < MAX_DRUGS; i++) {
+    touchStates[i] = digitalRead(drugs[i].touchPin);
+
+    if (touchStates[i] != lastTouchStates[i] && touchStates[i] == HIGH) {
+      if (drugs[i].counter < drugs[i].dailyLimit) {
+        drugs[i].counter++;
+        updateBleCounters();
+        Serial.println(String(drugs[i].name) + " -> " + drugs[i].counter);
+      } else {
+        flashWhite();
+      }
     }
 
-    // Check if a day has passed and reset counters
-    if (millis() - lastResetTime >= DAY_LENGTH) {
-        tylenolCounter = 0;
-        vivaceCounter = 0;
-        lastResetTime = millis();
-        
-        // Update BLE characteristic with both reset values
-        unsigned char counterValues[8];
-        memcpy(&counterValues[0], &tylenolCounter, 4);
-        memcpy(&counterValues[4], &vivaceCounter, 4);
-        counterCharacteristic.setValue(counterValues, 8);
-        
-        Serial.println("Day reset! Counters reset to 0.");
-    }
+    lastTouchStates[i] = touchStates[i];
+  }
 
-    Serial.println(millis());
+  /* LCD display (2 drugs max) */
+  lcd.setCursor(0, 0);
+  lcd.print(drugs[0].name);
+  lcd.print(": ");
+  lcd.print(drugs[0].counter);
+  lcd.print("/");
+  lcd.print(drugs[0].dailyLimit);
 
-    // Read touch sensor states for both medications
-    touchStates[0] = digitalRead(TOUCH_PIN_MED1);  // Tylenol
-    touchStates[1] = digitalRead(TOUCH_PIN_MED2);  // Vivace
-
-    // Display Med 1 (Tylenol) on line 0
-    lcd.setCursor(0, 0);
-    lcd.print("Tylenol: ");
-    lcd.print(tylenolCounter);
-    lcd.print("/1");
-
-    // Display Med 2 (Vivace) on line 1
-    lcd.setCursor(0, 1);
-    lcd.print("Vivace: ");
-    lcd.print(vivaceCounter);
-    lcd.print("/3");
-
-    // Handle touch sensor for Med 1 (Tylenol)
-    if (touchStates[0] != lastTouchStates[0]) {
-        if (touchStates[0] == HIGH) {
-            if (tylenolCounter < 1) {  // Daily dosage limit for Tylenol is 1
-                tylenolCounter++;
-                
-                // Update BLE characteristic with both values
-                unsigned char counterValues[8];
-                memcpy(&counterValues[0], &tylenolCounter, 4);
-                memcpy(&counterValues[4], &vivaceCounter, 4);
-                counterCharacteristic.setValue(counterValues, 8);
-                
-                Serial.println("Tylenol doses: " + String(tylenolCounter));
-            }
-            else {
-                flashWhite(3, 150, 150);
-            }
-        }
-        lastTouchStates[0] = touchStates[0];
-    }
-
-    // Handle touch sensor for Med 2 (Vivace)
-    if (touchStates[1] != lastTouchStates[1]) {
-        if (touchStates[1] == HIGH) {
-            if (vivaceCounter < 3) {  // Daily dosage limit for Vivace is 3
-                vivaceCounter++;
-                
-                // Update BLE characteristic with both values
-                unsigned char counterValues[8];
-                memcpy(&counterValues[0], &tylenolCounter, 4);
-                memcpy(&counterValues[4], &vivaceCounter, 4);
-                counterCharacteristic.setValue(counterValues, 8);
-                
-                Serial.println("Vivace doses: " + String(vivaceCounter));
-            }
-            else {
-                flashWhite(3, 150, 150);
-            }
-        }
-        lastTouchStates[1] = touchStates[1];
-    }
-    
+  lcd.setCursor(0, 1);
+  lcd.print(drugs[1].name);
+  lcd.print(": ");
+  lcd.print(drugs[1].counter);
+  lcd.print("/");
+  lcd.print(drugs[1].dailyLimit);
 }

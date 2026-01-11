@@ -69,16 +69,14 @@ export default function User(props) {
       const initialValue = await counterChar.readValue();
       const tylenolValue = initialValue.getUint32(0, true);
       const vivaceValue = initialValue.getUint32(4, true);
-      console.log(`Initial values - ${drugs[0].drug}:`, tylenolValue, `${drugs[1].drug}:`, vivaceValue);
       
-      setDrugs((prev) => {
-        const updated = prev.map((drug, index) => {
-          if (index === 0) return [drug[0], tylenolValue, drug[2], drug[3]];
-          if (index === 1) return [drug[0], vivaceValue, drug[2], drug[3]];
-          return drug;
-        });
-        return updated;
-      });
+      // setDrugs((prev) => {
+      //   const updated = prev.map((drug, index) => {
+      //     if (index === 0) return [drug.drug, drug.dosage, drug.taken, drug.unit];
+      //     return drug;
+      //   });
+      //   return updated;
+      // });
 
       // Setup notifications for counter characteristic updates
       await counterChar.startNotifications();
@@ -87,17 +85,16 @@ export default function User(props) {
         const dataView = event.target.value;
         const tylenolValue = dataView.getUint32(0, true);
         const vivaceValue = dataView.getUint32(4, true);
-        console.log("Updated values - Tylenol:", tylenolValue, "Vivace:", vivaceValue);
 
         // Update both drugs with their respective counter values
-        setDrugs((prev) => {
-          const updated = prev.map((drug, index) => {
-            if (index === 0) return [drug[0], tylenolValue, drug[2], drug[3]];
-            if (index === 1) return [drug[0], vivaceValue, drug[2], drug[3]];
-            return drug;
-          });
-          return updated;
-        });
+        // setDrugs((prev) => {
+        //   const updated = prev.map((drug, index) => {
+        //     if (index === 0) return [drug[0], tylenolValue, drug[2], drug[3]];
+        //     if (index === 1) return [drug[0], vivaceValue, drug[2], drug[3]];
+        //     return drug;
+        //   });
+        //   return updated;
+        // });
       };
 
       counterChar.addEventListener('characteristicvaluechanged', notificationHandlerRef.current);
