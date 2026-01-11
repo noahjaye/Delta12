@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include <rgb_lcd.h>
 #include <CurieBLE.h>
 #include <CurieTime.h>
@@ -6,7 +7,7 @@
 
 #define TOUCH_PIN_MED1 3  // Tylenol
 #define TOUCH_PIN_MED2 4  // Vivace (reserved for future use)
-#define REFRESH_RATE 60   // in Hz
+#define REFRESH_RATE 50   // in Hz
 
 rgb_lcd lcd;
 
@@ -23,9 +24,20 @@ unsigned long lastRefreshTime = 0;
 unsigned long lastResetTime = 0;
 const unsigned long DAY_LENGTH = 30000; // 30s for testing (in milliseconds)
 
+// Flash the LCD backlight white a few times to indicate an error/limit
+void flashWhite(int times = 3, int onMs = 100, int offMs = 100) {
+    for (int i = 0; i < times; ++i) {
+        lcd.setRGB(255, 255, 255);
+        delay(onMs);
+        lcd.setRGB(0, 0, 0);
+        delay(offMs);
+    }
+    // leave backlight on white after flashing
+    lcd.setRGB(255, 255, 255);
+}
+
 void setup() {
     lcd.begin(16, 2); // Initialize a 16x2 LCD
-    lcd.setRGB(255, 255, 255);
     lcd.print("Initializing...");
     
     // Initialize BLE
@@ -112,6 +124,9 @@ void loop() {
                 
                 Serial.println("Tylenol doses: " + String(tylenolCounter));
             }
+            else {
+                flashWhite(3, 150, 150);
+            }
         }
         lastTouchStates[0] = touchStates[0];
     }
@@ -129,6 +144,9 @@ void loop() {
                 counterCharacteristic.setValue(counterValues, 8);
                 
                 Serial.println("Vivace doses: " + String(vivaceCounter));
+            }
+            else {
+                flashWhite(3, 150, 150);
             }
         }
         lastTouchStates[1] = touchStates[1];
