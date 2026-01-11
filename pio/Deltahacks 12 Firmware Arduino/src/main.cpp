@@ -60,12 +60,13 @@ void loop() {
     lcd.print(millis() / 1000);
     lcd.print(" s");
 
-    if (touchState != lastTouchState) {
-        lcd.setCursor(0, 1);
+    // Update LCD Dose counter
+    lcd.setCursor(0, 1);
+    lcd.print("Doses: " + String(counterValue) + "   ");
 
+    if (touchState != lastTouchState) {
         // Touched
         if (touchState == HIGH) {
-            lcd.print("Doses: " + String(counterValue));
             counterValue++;
             counterCharacteristic.setValue(counterValue);
             Serial.println("Doses: " + String(counterValue));
@@ -76,8 +77,12 @@ void loop() {
 
     if (commandCharacteristic.written()) {
         uint8_t cmd = commandCharacteristic.value()[0];
-        if (cmd == 1) { // Reset command
+        if (cmd == 1) { // Decrement command
             if (counterValue > 0) counterValue--;
+            counterCharacteristic.setValue(counterValue);
+        }
+        else if (cmd == 2) { // Increment command
+            counterValue++;
             counterCharacteristic.setValue(counterValue);
         }
     }
